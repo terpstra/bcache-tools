@@ -551,6 +551,8 @@ static int bch_write_extent(struct bch_write_op *op,
 
 		ret = orig->bi_iter.bi_size != 0;
 	} else {
+		struct bch_csum csum_zero;
+
 		bio = bio_next_split(orig, ob->sectors_free, GFP_NOIO,
 				     &c->bio_write);
 
@@ -559,9 +561,9 @@ static int bch_write_extent(struct bch_write_op *op,
 		wbio->bounce		= false;
 		wbio->put_bio		= bio != orig;
 
+		bch_zero(csum_zero);
 		init_append_extent(op, bio_sectors(bio), bio_sectors(bio),
-				   compression_type, 0,
-				   (struct bch_csum) { 0 }, csum_type, ob);
+				   compression_type, 0, csum_zero, csum_type, ob);
 
 		ret = bio != orig;
 	}

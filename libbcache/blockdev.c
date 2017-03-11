@@ -39,12 +39,13 @@ void bch_write_bdev_super(struct cached_dev *dc, struct closure *parent)
 	struct backingdev_sb *sb = dc->disk_sb.sb;
 	struct closure *cl = &dc->sb_write;
 	struct bio *bio = dc->disk_sb.bio;
+	struct nonce zero;
 
 	down(&dc->sb_write_mutex);
 	closure_init(cl, parent);
 
-	sb->csum = csum_vstruct(NULL, BCH_CSUM_CRC64,
-				(struct nonce) { 0 }, sb).lo;
+	bch_zero(zero);
+	sb->csum = csum_vstruct(NULL, BCH_CSUM_CRC64, zero, sb).lo;
 
 	bio_reset(bio);
 	bio->bi_bdev		= dc->disk_sb.bdev;

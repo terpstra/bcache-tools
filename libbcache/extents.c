@@ -201,8 +201,10 @@ void bch_extent_narrow_crcs(struct bkey_s_extent e)
 {
 	union bch_extent_crc *crc;
 	bool have_wide = false, have_narrow = false;
-	struct bch_csum csum = { 0 };
+	struct bch_csum csum;
 	unsigned csum_type = 0;
+
+	bch_zero(csum);
 
 	extent_for_each_crc(e, crc) {
 		if (crc_compression_type(crc) ||

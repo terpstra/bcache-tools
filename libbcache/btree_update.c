@@ -140,7 +140,8 @@ found:
 	 * moving this reference from, hence one comparison here:
 	 */
 	if (gc_pos_cmp(c->gc_pos, gc_phase(GC_PHASE_PENDING_DELETE)) < 0) {
-		struct bch_fs_usage tmp = { 0 };
+		struct bch_fs_usage tmp;
+		bch_zero(tmp);
 
 		bch_mark_key(c, bkey_i_to_s_c(&d->key),
 			     -c->sb.btree_node_size, true, b
@@ -208,7 +209,8 @@ void bch_btree_node_free_inmem(struct btree_iter *iter, struct btree *b)
 static void bch_btree_node_free_ondisk(struct cache_set *c,
 				       struct pending_btree_node_free *pending)
 {
-	struct bch_fs_usage stats = { 0 };
+	struct bch_fs_usage stats;
+	bch_zero(stats);
 
 	BUG_ON(!pending->index_update_done);
 
@@ -374,7 +376,8 @@ static void bch_btree_set_root_inmem(struct cache_set *c, struct btree *b,
 		 * bch_btree_root_read()) - do marking while holding
 		 * btree_root_lock:
 		 */
-		struct bch_fs_usage stats = { 0 };
+		struct bch_fs_usage stats;
+		bch_zero(stats);
 
 		bch_mark_key(c, bkey_i_to_s_c(&b->key),
 			     c->sb.btree_node_size, true,
@@ -633,9 +636,11 @@ static void bch_insert_fixup_btree_ptr(struct btree_iter *iter,
 				       struct disk_reservation *disk_res)
 {
 	struct cache_set *c = iter->c;
-	struct bch_fs_usage stats = { 0 };
+	struct bch_fs_usage stats;
 	struct bkey_packed *k;
 	struct bkey tmp;
+
+	bch_zero(stats);
 
 	if (bkey_extent_is_data(&insert->k))
 		bch_mark_key(c, bkey_i_to_s_c(insert),

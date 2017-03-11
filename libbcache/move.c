@@ -148,6 +148,8 @@ void bch_migrate_write_init(struct cache_set *c,
 			    const struct bch_extent_ptr *move_ptr,
 			    unsigned flags)
 {
+	struct disk_reservation zero_reservation;
+
 	bkey_reassemble(&m->key, k);
 
 	m->promote = false;
@@ -159,8 +161,9 @@ void bch_migrate_write_init(struct cache_set *c,
 	    (move_ptr && move_ptr->cached))
 		flags |= BCH_WRITE_CACHED;
 
+	bch_zero(zero_reservation);
 	bch_write_op_init(&m->op, c, &m->wbio,
-			  (struct disk_reservation) { 0 },
+			  zero_reservation,
 			  wp,
 			  bkey_start_pos(k.k),
 			  NULL, flags);

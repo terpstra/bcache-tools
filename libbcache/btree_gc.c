@@ -333,9 +333,11 @@ static void bch_mark_metadata(struct cache_set *c)
 /* Also see bch_pending_btree_node_free_insert_done() */
 static void bch_mark_pending_btree_node_frees(struct cache_set *c)
 {
-	struct bch_fs_usage stats = { 0 };
+	struct bch_fs_usage stats;
 	struct btree_interior_update *as;
 	struct pending_btree_node_free *d;
+
+	bch_zero(stats);
 
 	mutex_lock(&c->btree_interior_update_lock);
 	gc_pos_set(c, gc_phase(GC_PHASE_PENDING_DELETE));

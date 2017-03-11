@@ -138,8 +138,10 @@ do {									\
 
 #define bucket_stats_read_raw(_stats)					\
 ({									\
-	typeof(*this_cpu_ptr(_stats)) _acc = { 0 };			\
+	typeof(*this_cpu_ptr(_stats)) _acc;				\
 	int cpu;							\
+									\
+	bch_zero(_acc);							\
 									\
 	for_each_possible_cpu(cpu)					\
 		bucket_stats_add(&_acc, per_cpu_ptr((_stats), cpu));	\
@@ -305,17 +307,20 @@ static void bucket_stats_update(struct cache *ca,
 
 #define bucket_data_cmpxchg(ca, g, new, expr)			\
 ({								\
-	struct bch_fs_usage _stats = { 0 };		\
+	struct bch_fs_usage _stats;				\
 	struct bucket_mark _old = bucket_cmpxchg(g, new, expr);	\
 								\
+	bch_zero(_stats);					\
 	bucket_stats_update(ca, _old, new, &_stats);		\
 	_old;							\
 })
 
 void bch_invalidate_bucket(struct cache *ca, struct bucket *g)
 {
-	struct bch_fs_usage stats = { 0 };
+	struct bch_fs_usage stats;
 	struct bucket_mark old, new;
+
+	bch_zero(stats);
 
 	old = bucket_cmpxchg(g, new, ({
 		new.owned_by_allocator	= 1;
@@ -606,8 +611,9 @@ void __bch_gc_mark_key(struct cache_set *c, struct bkey_s_c k,
 void bch_gc_mark_key(struct cache_set *c, struct bkey_s_c k,
 		     s64 sectors, bool metadata)
 {
-	struct bch_fs_usage stats = { 0 };
+	struct bch_fs_usage stats;
 
+	bch_zero(stats);
 	__bch_gc_mark_key(c, k, sectors, metadata, &stats);
 
 	preempt_disable();

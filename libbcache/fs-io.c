@@ -2212,9 +2212,11 @@ static long bch_fallocate(struct inode *inode, int mode,
 		goto err;
 
 	while (bkey_cmp(iter.pos, end) < 0) {
-		struct disk_reservation disk_res = { 0 };
+		struct disk_reservation disk_res;
 		struct bkey_i_reservation reservation;
 		struct bkey_s_c k;
+
+		bch_zero(disk_res);
 
 		k = bch_btree_iter_peek_with_holes(&iter);
 		if ((ret = btree_iter_err(k)))

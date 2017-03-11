@@ -139,7 +139,9 @@ void __bch_verify_btree_nr_keys(struct btree *b)
 {
 	struct bset_tree *t;
 	struct bkey_packed *k;
-	struct btree_nr_keys nr = { 0 };
+	struct btree_nr_keys nr;
+
+	bch_zero(nr);
 
 	for_each_bset(b, t)
 		for (k = btree_bkey_first(b, t);

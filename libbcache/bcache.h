@@ -229,6 +229,9 @@ do {									\
 		bch_info(c, fmt, ##__VA_ARGS__);			\
 } while (0)
 
+#define bch_zero(x) \
+	memset(&x, 0, sizeof(x))
+
 /* Parameters that are useful for debugging, but should always be compiled in: */
 #define BCH_DEBUG_PARAMS_ALWAYS()					\
 	BCH_DEBUG_PARAM(key_merging_disabled,				\

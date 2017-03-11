@@ -251,8 +251,10 @@ struct bch_sb *bcache_format(struct format_opts opts,
 
 void bcache_super_write(int fd, struct bch_sb *sb)
 {
-	struct nonce nonce = { 0 };
+	struct nonce nonce;
 	unsigned i;
+
+	bch_zero(nonce);
 
 	for (i = 0; i < sb->layout.nr_superblocks; i++) {
 		sb->offset = sb->layout.sb_offset[i];

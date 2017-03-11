@@ -258,9 +258,11 @@ static int bch_prio_write(struct cache *ca)
 {
 	struct cache_set *c = ca->set;
 	struct journal *j = &c->journal;
-	struct journal_res res = { 0 };
+	struct journal_res res;
 	bool need_new_journal_entry;
 	int i, ret;
+
+	bch_zero(res);
 
 	if (c->opts.nochanges)
 		return 0;

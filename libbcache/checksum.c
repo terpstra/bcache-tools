@@ -255,8 +255,9 @@ struct bch_csum bch_checksum(struct cache_set *c, unsigned type,
 	case BCH_CSUM_CHACHA20_POLY1305_128: {
 		SHASH_DESC_ON_STACK(desc, c->poly1305);
 		u8 digest[POLY1305_DIGEST_SIZE];
-		struct bch_csum ret = { 0 };
+		struct bch_csum ret;
 
+		bch_zero(ret);
 		gen_poly_key(c, desc, nonce);
 
 		crypto_shash_update(desc, data, len);
@@ -286,8 +287,11 @@ struct bch_csum bch_checksum_bio(struct cache_set *c, unsigned type,
 	struct bvec_iter iter;
 
 	switch (type) {
-	case BCH_CSUM_NONE:
-		return (struct bch_csum) { 0 };
+	case BCH_CSUM_NONE: {
+		struct bch_csum zero_csum;
+		bch_zero(zero_csum);
+		return zero_csum;
+	}
 	case BCH_CSUM_CRC32C:
 	case BCH_CSUM_CRC64: {
 		u64 crc = bch_checksum_init(type);
@@ -308,8 +312,9 @@ struct bch_csum bch_checksum_bio(struct cache_set *c, unsigned type,
 	case BCH_CSUM_CHACHA20_POLY1305_128: {
 		SHASH_DESC_ON_STACK(desc, c->poly1305);
 		u8 digest[POLY1305_DIGEST_SIZE];
-		struct bch_csum ret = { 0 };
+		struct bch_csum ret;
 
+		bch_zero(ret);
 		gen_poly_key(c, desc, nonce);
 
 		bio_for_each_segment(bv, bio, iter) {

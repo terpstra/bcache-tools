@@ -612,6 +612,7 @@ int bch_sb_from_cache_set(struct cache_set *c, struct cache *ca)
 static const char *read_one_super(struct bcache_superblock *sb, u64 offset)
 {
 	struct bch_csum csum;
+	struct nonce zero_nonce;
 	size_t bytes;
 	unsigned order;
 reread:
@@ -647,8 +648,9 @@ reread:
 		return "unknown csum type";
 
 	/* XXX: verify MACs */
+	bch_zero(zero_nonce);
 	csum = csum_vstruct(NULL, BCH_SB_CSUM_TYPE(sb->sb),
-			    (struct nonce) { 0 }, sb->sb);
+			    zero_nonce, sb->sb);
 
 	if (bch_crc_cmp(csum, sb->sb->csum))
 		return "bad checksum reading superblock";
@@ -770,6 +772,7 @@ static bool write_one_super(struct cache_set *c, struct cache *ca, unsigned idx)
 {
 	struct bch_sb *sb = ca->disk_sb.sb;
 	struct bio *bio = ca->disk_sb.bio;
+	struct nonce zero_nonce;
 
 	if (idx >= sb->layout.nr_superblocks)
 		return false;
@@ -777,8 +780,8 @@ static bool write_one_super(struct cache_set *c, struct cache *ca, unsigned idx)
 	sb->offset = sb->layout.sb_offset[idx];
 
 	SET_BCH_SB_CSUM_TYPE(sb, c->opts.metadata_checksum);
-	sb->csum = csum_vstruct(c, BCH_SB_CSUM_TYPE(sb),
-				(struct nonce) { 0 }, sb);
+	bch_zero(zero_nonce);
+	sb->csum = csum_vstruct(c, BCH_SB_CSUM_TYPE(sb), zero_nonce, sb);
 
 	bio_reset(bio);
 	bio->bi_bdev		= ca->disk_sb.bdev;

@@ -555,6 +555,7 @@ static void cached_dev_write(struct cached_dev *dc, struct search *s)
 				     bio_end_sector(bio),
 				     bio_sectors(bio));
 	unsigned flags = BCH_WRITE_DISCARD_ON_ERROR;
+	struct disk_reservation zero_reservation;
 
 	down_read_non_owner(&dc->writeback_lock);
 	if (bch_keybuf_check_overlapping(&dc->writeback_keys,
@@ -625,8 +626,9 @@ static void cached_dev_write(struct cached_dev *dc, struct search *s)
 	if (bypass)
 		flags |= BCH_WRITE_DISCARD;
 
+	bch_zero(zero_reservation);
 	bch_write_op_init(&s->iop, dc->disk.c, &s->wbio,
-			  (struct disk_reservation) { 0 },
+			  zero_reservation,
 			  foreground_write_point(dc->disk.c,
 					(unsigned long) current),
 			  bkey_start_pos(&insert_key),
@@ -757,8 +759,10 @@ static void __blockdev_volume_make_request(struct request_queue *q,
 
 		continue_at(&s->cl, search_free, NULL);
 	} else if (rw) {
-		struct disk_reservation res = { 0 };
+		struct disk_reservation res;
 		unsigned flags = 0;
+
+		bch_zero(res);
 
 		if (bio_op(bio) != REQ_OP_DISCARD &&
 		    bch_disk_reservation_get(d->c, &res, bio_sectors(bio), 0)) {
