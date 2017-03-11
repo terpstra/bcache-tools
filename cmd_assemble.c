@@ -13,6 +13,7 @@
 int cmd_assemble(int argc, char *argv[])
 {
 	unsigned nr_devs = argc - 1;
+	unsigned i;
 
 	if (argc <= 1)
 		die("Please supply at least one device");
@@ -23,7 +24,7 @@ int cmd_assemble(int argc, char *argv[])
 	memset(assemble, 0, sizeof(*assemble));
 	assemble->nr_devs = nr_devs;
 
-	for (unsigned i = 1; i < argc; i++)
+	for (i = 1; i < argc; i++)
 	     assemble->devs[i] = (__u64) argv[i];
 
 	int ret = ioctl(bcachectl_open(), BCH_IOCTL_ASSEMBLE, assemble);

@@ -290,6 +290,7 @@ int cmd_device_fail(int argc, char *argv[])
 		{ NULL }
 	};
 	int opt, force_degraded = 0, force_data = 0, force_metadata = 0;
+	unsigned i;
 
 	while ((opt = getopt_long(argc, argv, "fh", longopts, NULL)) != -1)
 		switch (opt) {
@@ -305,7 +306,7 @@ int cmd_device_fail(int argc, char *argv[])
 
 	struct bcache_handle fs = bcache_fs_open(argv[optind]);
 
-	for (unsigned i = optind + 1; i < argc; i++) {
+	for (i = optind + 1; i < argc; i++) {
 		struct bch_ioctl_disk_set_state ir = {
 			.dev		= (__u64) argv[i],
 			.new_state	= BCH_MEMBER_STATE_FAILED,
@@ -348,6 +349,7 @@ int cmd_device_remove(int argc, char *argv[])
 		{ NULL }
 	};
 	int opt, force_data = 0, force_metadata = 0;
+	unsigned i;
 
 	while ((opt = getopt_long(argc, argv, "fh", longopts, NULL)) != -1)
 		switch (opt) {
@@ -366,7 +368,7 @@ int cmd_device_remove(int argc, char *argv[])
 
 	struct bcache_handle fs = bcache_fs_open(argv[optind]);
 
-	for (unsigned i = optind + 1; i < argc; i++) {
+	for (i = optind + 1; i < argc; i++) {
 		struct bch_ioctl_disk_remove ir = {
 			.dev = (__u64) argv[i],
 		};
