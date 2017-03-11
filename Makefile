@@ -1,7 +1,8 @@
 
 PREFIX=/usr
 INSTALL=install
-CFLAGS+=-std=gnu99 -O2 -g -MMD -Wall				\
+CC=gcc
+CFLAGS+=-O2 -g -MMD -Wall					\
 	-Wno-unused-but-set-variable				\
 	-Wno-pointer-sign					\
 	-fno-strict-aliasing					\
